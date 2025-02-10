@@ -1,0 +1,174 @@
+---
+title: "Homework8"
+author: "Neeraj Vardhan Buneeti"
+date: "2024-10-25"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Question 3
+
+```{r cars}
+library(lmtest)
+library(forecast)
+library(car)
+```
+
+```{r pressure, echo=FALSE}
+data <- read.csv("C:/Users/NEERAJ BUNEETI/Desktop/REG/R/AR1-data1.csv")
+model <- lm(y ~ x1+x2, data = data)
+dw_test <- dwtest (model)
+print(dw_test)
+```
+
+```{r}
+residuals <- residuals(model)
+acf(residuals, main="ACF of Residuals")
+```
+From the ACF plot, we see significant autocorrelation at early lags and a very low value of Durbin-Watson statistics ( > 2), which implies that residuals shows positive autocorrelations. This suggests that the realized regression model might not explain all intrinsic trends in data, which presumably is an infringement of linear regression's assumption on errors' independence. Additionally, to solve for this problem you could try time series modeling methods i.e. AR(1) or add lagged variables into the regression and rerun your OLS model making it valid again.
+
+
+## Question 4
+
+```{r}
+ar1_model <- arima(residuals, order=c(1,0,0))
+ar2_model <- arima(residuals, order=c(2,0,0))
+cat("AR(1) AIC:", ar1_model$aic, "\n")
+```
+
+```{r}
+cat("AR(2) AIC:", ar2_model$aic, "\n")
+```
+
+```{r}
+if (ar1_model$aic < ar2_model$aic) {
+  cat("AR(1) model is preferred based on AIC.\n")
+} else {
+  cat("AR(2) model is preferred based on AIC.\n")
+}
+```
+
+By fitting both models to the residuals and comparing their Akaike Information Criterion (AIC) values, we can ascertain whether the autocorrelation follows an AR(1) or AR(2) process.
+
+# Steps to Follow
+
+ Model Setup
+
+- **AR(1) Model**: The AR(1) model captures how residuals at the current time step are influenced by residuals from the previous time step (lag 1). This can be specified as `arima(residuals, order = c(1, 0, 0))`.
+- **AR(2) Model**: The AR(2) model accounts for the influence of both lag 1 and lag 2 residuals on the current residuals, specified as `arima(residuals, order = c(2, 0, 0))`.
+
+ Comparing the AIC Values
+
+- **AIC (Akaike Information Criterion)** is used to compare statistical models, considering both model fit and the number of parameters, to balance accuracy and simplicity.
+- The formula for AIC is: 
+  \[
+  AIC = 2k - 2\log(L)
+  \]
+  where \( k \) is the number of model parameters, and \( L \) is the likelihood of the model given the data.
+- The model with the **lower AIC** is preferred, as it indicates a better trade-off between model fit and complexity.
+
+ Making a Decision
+
+- If the **AR(1) model** has a lower AIC than the AR(2) model, it suggests that the autocorrelation pattern is best described by an AR(1) process, meaning that only the immediate past value influences the current residual.
+- If the **AR(2) model** has a lower AIC, the residuals are better explained by considering both the previous value and the one before that, indicating a more complex autocorrelation structure.
+
+ Interpretation
+
+The preferred model (with the lowest AIC) indicates the nature of the autocorrelation in the data. For example:
+- If **AR(1)** is chosen, it implies that the correlation mainly comes from the most recent past value.
+- If **AR(2)** is preferred, it means that the effect extends over two previous time steps.
+
+In summary, fitting both models and comparing their AIC values allows us to determine whether the process is better described by a single lag or by incorporating two lags, providing a systematic evaluation of the autocorrelation in the residuals.
+
+
+## Question 5
+#(b): Change of Variables and Regression Model in R
+
+```{r}
+library(dplyr)
+```
+
+```{r}
+library(stats)
+library(car)  
+library(ggplot2)  
+
+set.seed(123) 
+n <- 100
+data <- data.frame(
+  y = runif(n),
+  x1 = runif(n),
+  x2 = runif(n)
+)
+
+phi <- 0.5
+
+data <- data %>%
+  mutate(
+    y_lag = lag(y, 1),
+    x1_lag = lag(x1, 1),
+    x2_lag = lag(x2, 1)
+  )
+
+data <- data %>%
+  mutate(
+    y_prime = y - phi * y_lag,
+    x1_prime = x1 - phi * x1_lag,
+    x2_prime = x2 - phi * x2_lag
+  ) %>%
+  na.omit() 
+
+
+model <- lm(y_prime ~ x1_prime + x2_prime, data = data)
+
+summary(model)
+```
+
+#(c): Durbin-Watson Test and ACF Plot
+
+```{r}
+dw_stat <- durbinWatsonTest(model)
+print(dw_stat)
+```
+
+```{r}
+residuals <- model$residuals
+acf(residuals, main = "ACF of Residuals")
+```
+
+
+# Code Explanation
+
+**Data Creation**
+- Generates a sample dataset with `n = 100` observations for variables `y`, `x1`, and `x2`.
+
+**Lagged Variables**
+- Uses the `lag` function to create lagged versions of `y`, `x1`, and `x2`.
+
+**New Variables**
+- Creates transformed variables (`y'`, `x'i1`, and `x'i2`) based on specified transformations.
+
+**Model Fitting**
+- Fits a linear regression model using the `lm` function.
+
+**Durbin-Watson Test**
+- Applies the `durbinWatsonTest` function from the **car** package to test for autocorrelation in the model residuals.
+
+**ACF Plot**
+- Uses the `acf` function to plot the residuals' autocorrelation function, visually assessing autocorrelation.
+
+**Results Interpretation**
+
+**Model Summary**
+- `summary(model)` provides coefficients, standard errors, t-values, p-values, and R-squared values of the model.
+
+# Durbin-Watson Statistic
+- A value near 2 suggests no autocorrelation.
+- Values below 2 imply positive autocorrelation.
+- Values above 2 suggest negative autocorrelation.
+
+# ACF Plot
+- Ideally, the plot should show values near zero at higher lags, indicating minimal autocorrelation.

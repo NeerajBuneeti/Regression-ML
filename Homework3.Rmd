@@ -1,0 +1,51 @@
+---
+title: "Homework 3"
+author: "Neeraj Vardhan Buneeti"
+date: "2024-09-20"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#Question 3
+
+Based on the code from Homework 2, Problem 5, completing the given tasks.
+
+```{r}
+df <- read.csv("simulated_data.csv",header=TRUE,sep=',')
+
+x1<-df$x
+y<-df$y
+
+model1<- lm(y ~ x1)
+options(digits = 9)
+summary(model1)
+plot(x1,y)
+abline(model1)
+
+```
+
+#Question 4
+
+Based on thre code from Homework 2, Problem 5, completing the given tasks.
+
+```{r}
+df <- read.csv("simulated_data_nonconstant_variance.csv",header=TRUE,sep=',')
+
+x1<-df$x
+y<-df$y
+
+model1<- lm(y ~ x1)
+options(digits = 9)
+summary(model1)
+plot(x1,y)
+abline(model1)
+
+```
+
+
+
+
+# The variance in the plot 3(e) is less than the plot 4(e),we can observe that the variance in the plot 3(e) is constant whereas in the plot4(e) is not having a constant varaince and moreover the variance is increasing continuously.Therefore, we can say that the linear regression captures the data for the constant variance and is the best fit data.but for the plot 4(e) has the non constant variance so for this type of data linear regression is not suitable.

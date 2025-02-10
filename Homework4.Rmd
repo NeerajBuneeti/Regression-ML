@@ -1,0 +1,126 @@
+---
+title: "Homework 4"
+author: "Neeraj Vardhan Buneeti"
+date: "2024-09-28"
+output: html_document
+---
+
+#Question 1
+
+```{r}
+library("tidyverse")
+```
+
+```{r}
+mtcars
+```
+
+```{r}
+my_data <- mtcars %>%
+  select(mpg,cyl,disp,hp,wt)
+```
+
+```{r}
+model1 <- lm(mpg~cyl+disp+hp+wt,data=my_data)
+summary(model1)
+```
+
+```{r}
+model1 <- lm(mpg~cyl+hp+wt,data=my_data)
+summary(model1)
+```
+
+#1(a)
+To decide which variable to remove from the regression model, we can focus on the significance of each predictor using the p-values. The p-value helps us determine whether a variable has a meaningful impact on the target variable (`mpg`).
+
+Looking at the first model (`model1`), we see that the p-value for `disp` (displacement) is quite high (`0.331386`), indicating that it is not significantly contributing to the model. In contrast, `wt` (weight) is highly significant with a p-value of `0.000759`, making it an important predictor.
+
+Given this, the best approach is to remove `disp` from the analysis since it adds little value. The final model would then include `cyl`, `hp`, and `wt` as the three predictors that have more meaningful relationships with `mpg`.
+
+#1(b)
+
+```{r}
+model2 <- lm(mpg~cyl+hp+wt,data=my_data)
+summary(model2)
+```
+Considering all the p-values in the summary above, the variable "hp" has the highest value and can be neglected.
+
+```{r}
+model2 <- lm(mpg~cyl+wt,data=my_data)
+summary(model2)
+```
+
+#1(c)
+creating a regression model3
+```{r}
+my_data_final <- mtcars %>%
+  select(mpg,cyl,disp,hp,wt)
+model3 <- lm(mpg~cyl+wt,data=my_data)
+summary(model3)
+```
+Consider the significant features, which are "cyl" and "wt," based on their p-values being less than 0.05.
+
+#1(d)
+
+The R-squared value indicates how well the predictors explain the variability in the target variable. In this case, the R-squared of 0.83 means that about 83% of the variance in mpg is explained by cyl (cylinders) and wt (weight). Since both of these factors have a strong negative relationship with mpg, it suggests that cars with more cylinders and higher weight tend to have lower fuel efficiency. This strong correlation allows the model to maintain a high R-squared, even with just two predictors.
+
+#Question 2
+```{r}
+#install.packages("ISLR2")
+library("ISLR2")
+?Carseats
+```
+
+```{r}
+head(Carseats)
+```
+
+#2(a)
+```{r}
+my_data <-Carseats %>%
+  select(Sales, Advertising, Price)
+```
+
+```{r}
+model1 <- lm(Sales~Advertising+Price,data=my_data)
+summary(model1)
+```
+#2(b)
+Both Advertising and Price have p-values well below the significance threshold of 0.05. Specifically, the p-values are 3.64e-11 for Advertising and less than 2e-16 for Price. Since both p-values are small, we can reject the null hypothesis (H₀: βⱼ = 0) for both predictors.
+
+#2(c)
+While Advertising and Price are statistically significant, the R-squared value is 0.2819, meaning these two predictors explain only about 28% of the variation in car seat sales. This leaves 72% of the variability unexplained by these predictors alone. Therefore, relying solely on Advertising and Price would not give a full picture, and additional factors should be considered for more accurate predictions.
+
+#Question 3
+
+```{r}
+MMass_data <- read.table("MMass.txt",header=FALSE)
+head(MMass_data)
+```
+
+```{r}
+x <- MMass_data$V2
+y <- MMass_data$V1
+plot(x,y)
+```
+
+```{r}
+model1 <- lm(y~x)
+summary(model1)
+```
+
+```{r}
+plot(x,y)
+abline(model1)
+```
+
+#3(b)
+The average change in muscle mass for women differing in age by one year is indicated by the slope coefficient from the regression model. In this case, the slope is -1.1900, which means that, on average, muscle mass decreases by 1.19 units for each additional year of age. The negative sign of the slope confirms that this relationship is inversely correlated, signifying that as age increases, muscle mass tends to decline.
+
+#3(c)
+To estimate the constant variance of the error term (sigma square), we can derive it from the sample variance. The residual standard error (RSE) from our model is 8.173, and we have 58 degrees of freedom (n - p). First, we calculate the residual sum of squares (RSS) using the formula:RSS=(RSE)2×(𝑛−𝑝)=(8.173)^2×58, Calculating this gives us an RSS of approximately 66.79. To find the point estimate for sigma square, we use the equation: constant variance of the error term (sigma square)=RSS/(n−p), Substituting the RSS into this equation provides a point estimate for the constant variance, which comes out to be around 1.15
+
+#3(d)
+The linear regression model appears to fit the data well, as evidenced by the R-squared value of 0.7501. This value indicates that about 75% of the variability in muscle mass can be explained by age, suggesting a strong relationship between these two variables. Additionally, the p-value associated with the slope of age is 2.2e-16, which is significantly less than the typical threshold of 0.05, demonstrating that age is a significant predictor of muscle mass.
+
+Moreover, the regression plot illustrates a downward trend, further supporting the notion that muscle mass decreases as age increases. Collectively, these metrics affirm that the linear regression model is a reliable representation of the relationship between age and muscle mass.

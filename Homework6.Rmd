@@ -1,0 +1,198 @@
+---
+title: "Homework6"
+author: "Neeraj Vardhan Buneeti"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Question 1)
+
+```{r cars}
+#install.packages("ISLR2")
+library("ISLR2")
+?Carseats
+```
+
+```{r pressure, echo=FALSE}
+y <- Carseats$Sales
+x1 <- ifelse(Carseats$Urban == 'Yes', 1, 0)
+x2 <- ifelse(Carseats$US == 'Yes', 1, 0)
+x3 <- Carseats$Price
+
+model1 <- lm(y ~ x1 + x2 + x3)
+summary(model1)
+```
+
+(b) Interpretation of Coefficients in Model 1:
+
+- Intercept (13.043469): The intercept represents the predicted Sales value when all the predictor variables (Urban, US, and Price) are set to their baseline levels (Urban = 0, US = 0, and Price = 0). Since a Price of 0 isn't realistic, the intercept itself doesn't have much practical significance but serves as the reference point for the model.
+
+- x1 (Urban: -0.021916): This coefficient shows the expected difference in Sales between Urban and Non-Urban locations, keeping other variables constant. Specifically, being in an Urban area is linked to a decrease of roughly 0.0219 units in Sales compared to Non-Urban areas. However, with a p-value of 0.936, this effect is not statistically significant.
+
+- x2 (US: 1.200573): This coefficient indicates the difference in Sales between US-based stores and stores outside the US, with other factors held constant. Being located in the US is associated with a 1.2006-unit increase in Sales, and this effect is statistically significant with a p-value of 4.86e-06 (*), showing strong evidence that being in the US impacts Sales.
+
+- x3 (Price: -0.054459): This coefficient represents the expected change in Sales for a one-unit increase in Price, assuming all other variables remain the same. For every one-unit rise in Price, Sales is expected to drop by approximately 0.0545 units. This effect is highly significant, with a p-value below 2e-16 (*), indicating strong evidence that Price influences Sales.
+
+(c) Hypothesis Testing for Predictors:
+
+The null hypothesis (H0) for each predictor states that its coefficient is zero, meaning it has no effect on Sales (H0: βj = 0).
+
+- For x1 (Urban), the p-value is 0.936, which is far greater than the standard significance level of 0.05. As a result, we cannot reject the null hypothesis, suggesting that Urban status does not significantly affect Sales.
+
+- For x2 (US), the p-value is 4.86e-06, well below 0.05. This leads us to reject the null hypothesis, indicating that being in the US has a statistically significant effect on Sales.
+
+- For x3 (Price), the p-value is less than 2e-16, also below 0.05. Therefore, we reject the null hypothesis, confirming that Price has a significant impact on Sales.
+
+In summary, the null hypothesis is rejected for US and Price, while it cannot be rejected for Urban.
+
+(d) Since Urban is not a statistically significant predictor, a simpler model is created, including only the significant predictors—US and Price.
+
+
+
+```{r}
+
+model2 <- lm(y ~ x2 + x3)
+summary(model2)
+```
+
+
+
+(e) Evaluating Model Performance:
+
+To assess how well the models from parts (a) and (d) fit the data, we look at key performance metrics: Adjusted R², Residual Standard Error (RSE), and the F-statistic. These metrics help in understanding the models' explanatory power, prediction accuracy, and overall statistical significance.
+
+Model 1 (from part a):
+
+- Adjusted R²: 0.2335  
+This value means that about 23.35% of the variation in Sales is explained by the predictors (Urban, US, and Price). While this isn't particularly high, it indicates a moderate level of fit, showing that the model captures some of the variation in Sales but leaves a considerable portion unexplained.
+
+- Residual Standard Error (RSE): 2.472  
+The RSE gives an average measure of how far off the model's predictions are from the actual values. With an RSE of 2.472, on average, the model's predictions are off by about 2.47 units from the observed Sales values.
+
+- F-statistic: 41.52 (p-value < 2.2e-16)  
+The highly significant F-statistic suggests that the model as a whole performs better than one with no predictors. However, since Urban was not found to be a significant predictor, it likely contributes little to improving the model's fit.
+
+Model 2 (from part d):
+
+- Adjusted R²: 0.2354  
+This value is slightly higher than in Model 1, indicating that approximately 23.54% of the variation in Sales is explained by the two predictors (US and Price). The small increase suggests that removing the Urban variable has slightly improved the model's fit.
+
+- Residual Standard Error (RSE): 2.469  
+The RSE has decreased marginally to 2.469, meaning that the model's predictions are a bit closer to the actual Sales values. This slight improvement in accuracy indicates that the simpler model is slightly better at predicting Sales.
+
+- F-statistic: 62.43 (p-value < 2.2e-16)  
+The higher F-statistic compared to Model 1 suggests that the reduced model has a better overall fit. The remaining predictors (US and Price) together have a stronger effect on Sales than when Urban was included.
+
+Comparison and Conclusion:
+
+Both models highlight that US and Price are significant predictors of Sales. Model 2, however, performs slightly better, with a higher Adjusted R² and a lower RSE, indicating improved accuracy and explanatory power. By excluding the non-significant Urban variable, Model 2 is simpler and avoids unnecessary complexity while maintaining a solid fit to the data. Thus, Model 2 is the better choice, as it balances simplicity with accuracy and explanatory power.
+
+
+
+## Question 2)
+
+```{r}
+
+library(dplyr)
+```
+
+```{r}
+
+swiss <- mutate(swiss, CatholicBin = 1 * (Catholic > 50))
+
+x1 <- swiss$Agriculture
+y <- swiss$Fertility
+
+model1 <- lm(y ~ x1 + factor(CatholicBin), data = swiss)
+summary(model1)$coefficients
+```
+
+
+
+Model Summary Interpretation:
+
+Intercept (60.83): The intercept represents the expected Fertility when both Agriculture is zero and CatholicBin is 0 (i.e., in provinces with 50% or fewer Catholics).Here, the intercept is 60.83, which indicates the baseline fertility rate in non-majority Catholic provinces, assuming no influence from agriculture.
+
+Agriculture (x1): Coefficient = 0.1242, p-value = 0.1329: The coefficient for Agriculture is 0.1242, suggesting that for each 1% increase in the male agricultural workforce, Fertility increases by approximately 0.124 units, holding Catholicism constant. However, the p-value for this coefficient is 0.1329, which is higher than the typical significance level of 0.05. This indicates that the effect of Agriculture on Fertility is not statistically significant at the 5% level. Therefore, there is insufficient evidence to conclude that Agriculture has a meaningful impact on Fertility in this model.
+
+Catholic Majority (factor(CatholicBin)1): Coefficient = 7.8843, p-value = 0.0412: The coefficient for CatholicBin is 7.8843. This indicates that, on average, provinces where more than 50% of the population is Catholic have a Fertility rate that is 7.88 units higher than those with 50% or fewer Catholics, holding Agriculture constant. The p-value for this coefficient is 0.0412, which is below the 0.05 significance level. This indicates that the Catholic majority status has a statistically significant effect on Fertility. Hence, there is enough evidence to suggest that being in a Catholic-majority province is associated with higher fertility.
+
+Conclusion from the Regression Analysis:
+
+Significance: The Catholic majority (binary) variable is statistically significant, implying that fertility rates are higher in provinces with a majority Catholic population. Agriculture, however, is not statistically significant in this model, suggesting that the percentage of males in agriculture does not have a strong association with fertility rates in this dataset.
+Direction of Effects: The positive coefficient for CatholicBin suggests that a majority Catholic population is associated with higher fertility. Although the coefficient for Agriculture is positive, the lack of statistical significance means we cannot confidently say that agriculture participation correlates with fertility in this context.
+Model Implications: The results suggest that religious composition (being a Catholic-majority province) is a more important factor for fertility rates than agricultural employment among men in the dataset. Additional variables or a different model structure may be needed to better explain variations in fertility for a more comprehensive model.
+This analysis helps highlight socio-religious factors over economic factors (like agriculture) in explaining fertility rates among Swiss provinces in the dataset.
+
+
+
+## Question 4)
+```{r}
+Catdata <- read.csv("Cat1.CSV", header = TRUE, sep = ",")
+
+plot(Catdata$x1, Catdata$y)
+
+```
+
+```{r}
+
+x2 <- ifelse(Catdata$group == 'A', 1, 0)
+x3 <- ifelse(Catdata$group == 'B', 1, 0)
+x4 <- ifelse(Catdata$group == 'C', 1, 0)
+
+df_new <- data.frame(toolwear = Catdata$y, speed = Catdata$x1, x2, x3, x4)
+
+model1 <- lm(toolwear ~ speed + factor(x2) + factor(x3) + factor(x4), data = df_new)
+
+summary(model1)
+```
+
+```{r}
+
+summary(model1)$coef
+```
+
+
+Model Summary:
+
+The regression model is: 
+\[ \text{toolwear} = \beta_0 + \beta_1 \cdot \text{speed} + \beta_2 \cdot x_2 + \beta_3 \cdot x_3 + \beta_4 \cdot x_4 + \epsilon \]
+
+Where:
+
+- Intercept (β₀): Represents the baseline tool wear when speed is zero and the tool model is D (the reference category).
+- Speed (β₁): The effect of speed on tool wear, keeping the tool model constant.
+- (x₂) (factor(x₂)1): An indicator variable for tool model A, showing how wear differs compared to model D.
+- (x₃) (factor(x₂)1): An indicator variable for tool model B, indicating how wear differs compared to model D.
+- (x₄) (factor(x₄)1): An indicator variable for tool model C, reflecting how wear differs compared to model D.
+
+### Interpretation of Coefficients:
+
+- Intercept (29.73): This value represents the estimated tool wear when the speed is zero and the tool model is D. Since zero speed may not be realistic in this context, the intercept is more of a reference point for the model.
+  
+- Speed (3.88), p-value = 0.073: The coefficient of 3.88 suggests that for every unit increase in speed, tool wear is expected to rise by 3.88 units, assuming the tool model remains constant. With a p-value of 0.073, this effect is not statistically significant at the typical 5% threshold but indicates a weak association between speed and wear.
+
+- Tool Model A (2.11), p-value = 0.202: This coefficient shows that tool model A is associated with about 2.11 more units of wear compared to model D, assuming speed remains the same. However, the p-value (0.202) indicates that this difference is not statistically significant.
+
+- Tool Model B (1.45), p-value = 0.379: The coefficient for tool model B indicates that it has about 1.45 units more wear than model D. However, with a p-value of 0.379, this effect is not statistically significant.
+
+- Tool Model C (0.29), p-value = 0.860: Tool model C's coefficient suggests a minimal difference in wear (0.29 units) compared to model D, and the high p-value of 0.860 shows this difference is not statistically meaningful.
+
+### Model Fit and Overall Significance:
+
+- R-squared: 0.07094, Adjusted R-squared: 0.02139: The model explains only about 7% of the variance in tool wear, which indicates a weak fit. This low R-squared suggests that many other factors influencing tool wear are not captured by this model.
+
+- F-statistic: 1.432, p-value = 0.2318: The p-value for the overall model (0.2318) is well above 0.05, meaning that the predictors (speed and tool model) collectively do not significantly explain the variance in tool wear. In other words, the model does not provide a statistically strong fit.
+
+### Conclusion:
+
+- Lack of Significance in Predictors: None of the coefficients for the tool models (A, B, or C) are statistically significant, meaning there is no strong evidence to suggest that these models differ in their wear patterns compared to model D.
+  
+- Weak Relationship Between Speed and Wear: While speed has a positive coefficient, its association with tool wear is not strong enough to be considered statistically significant at the 5% level.
+
+- Poor Overall Model Fit: The low R-squared and non-significant overall model p-value suggest that speed and tool model are not sufficient predictors of tool wear. Other factors not included in the model may have a greater impact on wear.
+
+Overall, the model indicates that speed and tool model, as defined, do not offer a solid explanation for tool wear. Future modeling efforts should explore other variables or a more complex approach to better understand the drivers of tool wear.

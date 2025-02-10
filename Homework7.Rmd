@@ -1,0 +1,96 @@
+---
+title: "Homework7"
+author: "Neeraj Vardhan Buneeti"
+date: "2024-10-18"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Question 3
+
+```{r cars}
+library(ggplot2)
+data <- read.csv("HW7-data-1.csv")
+model <- lm(y ~ x, data = data)
+data$fitted <- fitted (model)
+data$residuals <- resid(model)
+head (data)
+```
+
+```{r pressure, echo=FALSE}
+ggplot (data, aes (x = x, y = y)) +
+geom_point(color="blue", alpha = 0.6) + 
+geom_smooth (method = "lm", color = "black", se = FALSE) + 
+geom_segment (aes(x = x, xend = x, y = fitted, yend = y) ,
+color = "red", linetype = "dashed", alpha = 0.5) + 
+labs (title = "Regression Line with Residuals",
+x = "X",
+y = "y") +
+theme_minimal()
+```
+
+```{r}
+ggplot (data, aes (x = fitted, y = residuals)) +
+geom_point() +
+geom_hline(yintercept = 0, linetype = "dashed",color = "red") +
+  labs(title = "Residuals vs Fitted Values",
+x = "Fitted Values",
+y = "Residuals") +
+theme_minimal()
+```
+  i. The residuals appear to be randomly scattered around the horizontal line at y = 0, without any noticeable pattern, indicating that a linear model is appropriate for representing the relationship between x and y. If the data showed any curvature or trend, it would suggest that a linear model might not be suitable, and a nonlinear relationship could be present.
+
+  ii. Additionally, if the residuals are evenly spaced across all levels of the fitted values, we can infer that the variance of the residuals is constant, a condition known as homoscedasticity. However, if the spread of the residuals varies significantly, it would indicate a violation of the assumptions of linear regression.
+
+## Question 4
+
+```{r}
+library(ggplot2)
+data <- read.csv("HW7-data-1.csv")
+model <- lm(y ~ x, data = data)
+plot (model)
+```
+
+```{r}
+data$fitted <- fitted(model)
+data$residuals <- resid(model)
+ggplot(data, aes(x = residuals)) +
+geom_histogram(binwidth = 1, fill = "blue", color = "black", alpha = 0.7) +
+labs (title = "Histogram of Residuals",
+x = "Residuals",
+y = "Frequency") +
+theme_minimal ()
+```
+
+
+
+The QQ plot and histogram are used to assess the distribution of residuals in a regression model. In a QQ plot, residuals are compared to a normal distribution, and if the points form a straight line, it suggests that the residuals follow a normal distribution. However, deviations, such as skewness or heavy tails, may indicate issues with normality. 
+
+The histogram reflects the frequency distribution of the residuals, and a bell-shaped, symmetric curve implies normality. Any asymmetry, on the other hand, suggests a deviation from normality. Evaluating these plots helps determine whether the residuals satisfy the normality assumption, which is important for reliable statistical inference in linear regression.
+
+
+## Question 5
+```{r}
+library(ggplot2)
+data <- read.csv("HW7-data-2.csv")
+model <- lm(y ~ x, data = data)
+plot (model)
+```
+
+```{r}
+data$fitted <- fitted(model)
+data$residuals <- resid(model)
+ggplot(data, aes(x = residuals)) +
+geom_histogram(binwidth = 1, fill = "blue", color = "black", alpha = 0.7) +
+labs (title = "Histogram of Residuals",
+x = "Residuals",
+y = "Frequency") +
+theme_minimal ()
+```
+
+We observe from the QQ plot that only a portion of the points align with the diagonal line, indicating that most of the residuals do not follow a normal distribution. Significant deviations of points from this line suggest the presence of outliers. 
+
+The histogram helps identify skewness in the distribution, with a concentration of values near zero and a noticeable rightward tail, further confirming that the residuals do not follow a normal distribution.

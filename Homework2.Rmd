@@ -1,0 +1,78 @@
+---
+title: "Homework 2"
+author: "Neeraj Vardhan Buneeti"
+date: "2024-09-13"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Question 2
+
+We are revisting Question 3 from Homework 1, but this time using R and presenting the results with R Markdown. To start, we are creating a specific data frame.
+
+```{r}
+x <- c(1,2,4,6,7,8,10) 
+y <- c(10,14,12,13,15,12,13)
+
+# Combine vectors into a data frame
+df <- data.frame(x=x, y=y)
+
+# Print the data frame
+print(df)
+```
+
+## Question 4
+
+
+```{r}
+#manual computing
+Sxx=sum(x*x)-length(x)*mean(x)^2
+Sxy=sum(x*y)-length(x)*mean(x)^mean(y)
+Syy=sum(y*y)-length(x)*mean(x)^2
+
+beta1hat=Sxx/Syy
+beta0hat=mean(y)-beta1hat*mean(x)
+
+#print beta0hat and beta1hat
+print(paste("beta0hat =",beta0hat))
+print(paste("beta1hat =",beta1hat))
+
+
+#abline(a,b) adds a line with y-intercept as a and slope as b
+plot(x,y)
+abline(beta0hat,beta1hat)
+
+```
+```{r}
+df <- read.csv("Advertising.csv",header=TRUE,sep=',')
+
+x1<-df$TV
+x2<-df$radio
+x3<-df$newspaper
+y<-df$sales
+
+model1<- lm(y ~ x1)
+options(digits = 9)
+summary(model1)
+plot(x1,y)
+abline(model1)
+
+
+model2<-lm(y~x2)
+options(digits =9)
+summary(model2)
+plot(x2,y)
+abline(model2)
+
+
+model3<-lm(y~x3)
+options(digits = 9)
+summary(model3)
+plot(x3,y)
+abline(model3)
+
+```
+

@@ -1,0 +1,113 @@
+---
+title: "Homework 9"
+author: "Neeraj Vardhan Buneeti"
+date: "2024-11-15"
+output: html_document
+---
+
+## Question 1
+```{r}
+# Load dataset
+data <- read.csv("HW9Data1.csv")
+
+# Fit a linear regression model
+model <- lm(y ~ x1 + x2 + x3, data = data)
+
+# Calculate Cook’s Distance
+cooksD <- cooks.distance(model)
+
+# Identify influential points
+threshold <- 4 / nrow(data)
+influential_points <- which(cooksD > threshold)
+
+# Output results
+influential_points
+cooksD[influential_points]
+```
+These values show different levels of influence, with point 100 having the highest Cook's Distance.
+
+# 1(b)
+```{r cars}
+influential_points
+
+# Output the indices of influential points
+cooksD[influential_points]
+# Output the Cook's Distance for these influential points
+```
+
+According to standard criteria, a data point is influential if its Cook's Distance exceeds \( \frac{4}{n} \), where \( n \) is the number of observations. 
+
+For example, with \( n = 100 \), the threshold is \( 0.04 \). Based on this:
+
+-> Point 100 (Cook’s Distance: 5.17119) is influential as it exceeds the threshold.
+-> Points 12, 18, 59, 94, and 99, with values below 0.04, are not considered influential.
+
+In summary, only point 100 qualifies as influential by this criterion.
+
+# 1(c)
+
+```{r pressure, echo=FALSE}
+
+no_influential <- data[-influential_points, ]
+
+
+m_no_influential <- lm(y ~ x1 + x2 + x3, data = no_influential)
+
+
+RSE <- summary(model)$sigma 
+RSE_m_no_influential <- summary(m_no_influential)$sigma  
+
+RSE
+RSE_m_no_influential
+```
+
+Given the calculated RSE values:
+
+-> **RSE of Original Model:** (from `rse_original`)
+-> **RSE of Model without Influential Point:** (from `rse_no_influential`)
+
+**Conclusion and Interpretation:**
+
+->If the RSE of the model without point 100 is significantly lower than the original model's RSE, point 100 had a strong impact on the regression fit, and removing it improved model accuracy.
+
+->If the RSE remains similar without point 100, it suggests point 100 did not greatly influence the fit, indicating the remaining data sufficiently captures the trend.
+
+Comparing these RSE values helps assess model robustness and the influence of this outlier on the analysis.
+
+
+## Question 3
+
+```{r}
+# Load necessary library
+library(car)
+
+# Load the dataset
+HW9Data2 <- read.csv("HW9Data2.csv")
+
+# Fit a linear model
+model <- lm(y ~ x1 + x2 + x3 + x4 + x5, data = HW9Data2)
+
+# Calculate VIF values
+vif_values <- vif(model)
+print(vif_values)
+```
+**Interpretation of VIF Values:**
+
+-> **x1 (VIF = 89.84):** Severe multicollinearity; x1 is highly correlated with other predictors. Consider removing or modifying it.
+-> **x2 (VIF = 74.26):** Also shows severe multicollinearity. Evaluate x2 for possible removal or adjustment.
+-> **x3 (VIF = 7.02):** Moderate multicollinearity; may require further investigation to see if it should be combined with other variables or removed.
+-> **x4 (VIF = 1.03):** No multicollinearity issues; can remain in the model.
+-> **x5 (VIF = 1.02):** No multicollinearity concerns; can stay in the model.
+
+**Summary:**
+-> **Severe Multicollinearity:** x1 and x2 may need removal or modification.
+-> **Moderate Multicollinearity:** x3 could require further investigation.
+-> **No Concerns:** x4 and x5 are suitable to keep.
+
+
+
+
+
+
+
+

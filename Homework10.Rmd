@@ -1,0 +1,121 @@
+---
+title: "Homework 10"
+author: "Neeraj Vardhan Buneeti"
+date: "2024-11-27"
+output: html_document
+---
+
+## Question 2
+# (a)
+
+```{r}
+data <- read.csv("C:/Users/NEERAJ BUNEETI/Desktop/REG/R/LogisticData.csv")
+data$Education <- factor(data$Education)
+levels(data$Education)
+
+data$Education <- relevel(data$Education, ref = "HighSchool")
+levels(data$Education)
+```
+
+# (b)
+
+```{r cars}
+model <- glm(Purchase ~ Age + Income + Education, data = data, family = binomial)
+summary(model)
+```
+
+# (c)
+i) The coefficient of Age indicates the magnitude of change in the log-odds of purchasing for every year a person ages.
+
+Log-odds: Log-odds are the logarithm of the probability ratio for an event to occur (in this case, purchasing). Odds are the ratio of probabilities of an event happening versus not happening. Log-odds convert odds into a scale ranging from 0 to +∞.
+
+A positive coefficient for Age suggests that as a person ages, their log-odds of purchasing increase, holding other factors like income and education constant.
+
+Note: The change in log-odds may not be linear; it could be non-monotonic.
+
+ii) The coefficient for Income tells us how a one-dollar increase in an individual’s income affects the log-odds of purchasing.
+
+A positive coefficient for Income indicates that as income increases, the likelihood of purchasing also increases. In other words, as income rises, the probability of making a purchase increases.
+
+A negative sign for Income suggests that as income increases, the log-odds of purchasing decrease. This means that having a higher income reduces the likelihood of purchasing, which is uncommon in typical cases (where income correlates with increased spending power).
+
+iii) Education is a categorical variable with three levels: “Highschool,” “College,” and “Graduate.” In the model, one of these categories is treated as a reference group (in this case, Highschool). The other groups (College and Graduate) are compared to the reference group.
+
+The coefficients for Education indicate the difference in log-odds of buying between individuals with College and Graduate education levels compared to those with only a high school education (the reference group).
+
+- *Education College:* This variable is coded “1” for individuals with a college education or higher and “O” for those with only a high school education. If the coefficient for Education College is positive, it means that people with a college education are more likely to make a purchase compared to those with only a high school education, holding age and income constant. Conversely, a negative coefficient for Education Graduate suggests that individuals with a graduate degree are less likely to purchase compared to those with only a high school education, all other things being equal.
+
+- *Age:* A higher value indicates a higher likelihood of purchasing for older individuals, while a lower value suggests the opposite.
+
+- *Income:* The sign of the coefficient indicates whether a higher income increases (positive) or decreases (negative) the probability of purchase.
+
+- *Education:* The coefficients compare the likelihood of purchasing among individuals with a college or graduate degree compared to those with only a high school diploma.
+
+In summary, “College” indicates that college graduates are more likely to purchase compared to high school graduates, while “Graduate” suggests that post-graduate individuals are less likely to purchase compared to high school graduates.
+
+# (d)
+
+```{r pressure, echo=FALSE}
+#Predict the probability:
+new_data <- data.frame(Age = 30, Income = 50000, 
+                       Education = factor("College", levels = c("Highschool", "College", "Graduate")))
+
+
+predicted_prob <- predict(model, new_data, type = "response")
+predicted_prob
+```
+# (e)
+
+```{r}
+library(caret)
+predictions <- ifelse(predict(model, type = "response") > 0.5, 1, 0)
+conf_matrix <- confusionMatrix(as.factor(predictions), as.factor(data$Purchase))
+conf_matrix
+```
+
+## Question 3
+
+
+```{r}
+data <- read.csv("C:/Users/NEERAJ BUNEETI/Desktop/REG/R/PoissonData.csv")
+head(data)
+```
+# (a)
+
+```{r}
+hist(data$ER_Visits, main = "Histogram of ER Visits", 
+     xlab = "Number of ER visits", col = "Skyblue", border = "black")
+```
+
+With this, you’ll obtain a histogram illustrating the distribution of emergency room visits. Given that it’s a count data type, you should anticipate a right-skewed distribution (meaning most individuals rarely visit the ER, while a few people visit frequently, resulting in higher counts). This aligns with the characteristics of count data, and it makes sense that a Poisson distribution could be an appropriate fit.
+
+# (b)
+```{r}
+# Fit Poisson regression model
+model <- glm(ER_Visits ~ Age + Income + Insurance, family = poisson(link = "log"), data = data)
+
+# View the summary of the model
+summary(model)
+```
+
+# (c)
+i) Age: -0.0222 (the coefficient for Age). This indicates that for every one-year increase in age, the expected number of ER visits decreases (by a factor of 0.94). Specifically, the expected number of ER visits is reduced by a factor of exp(-0.0222)(-0.0222) increment per additional age year. Interpretation In practical terms, this means older individuals tend to visit the ER less frequently. The negative coefficient sign suggests a decrease in the number of ER visits with increasing age. Various factors, such as improved healthcare and reduced reliance on acute primary care as people age, could contribute to this trend. Summary: Therefore, a one-year increase in age is associated with a 2.2% decrease in the number of ER visits. exp(-0.0222)=0.978(-0.0222)
+
+ii) The coefficient for Income is 0.0322, indicating that for every additional $1,000 in income, the expected number of ER visits increases by a factor of exp(0.0322)(0.0322). In layman’s terms, higher “salem” numbers earned from that source are likely to lead to more ER visits. The positive coefficient suggests a slight increase in the number of ER visits associated with higher income. Reasons for this could include greater access to healthcare or a higher propensity for specialty care that may lead to ER visits. To summarize, a $1,000 increase in income is associated with approximately 3.3% (exp.(0.0322) ≈ 1.033(0.0322)).
+
+iii) The coefficient for Insurance is -0.6015, indicating that, on average, individuals without insurance are expected to visit the ER more frequently than those with insurance. In particular, being insured reduces the expected number of ER visits by exp(-0.6015) (-0.6015).
+
+These results suggest that the probability of using emergency room services is likely to be lower among individuals with health insurance. This could be due to the fact that insured individuals are better equipped to receive preventative services, routine doctor visits, and other health resources that can help prevent trips to the emergency room. Alternatively, they may be receiving other forms of care that keep them out of the ER.
+
+To summarize, the expected value of ER visit count is 45% lower with health insurance (since exp(-1048228) ≈ 0. (-0.6015) ≈ 0.548 (-0.6015)).
+
+# (d)
+
+```{r}
+new_data <- data.frame(Age = 40, Income = 50, Insurance = 1)
+predicted_visits <- predict(model, newdata = new_data, type = "response")
+cat("Predicted number of ER visits:", predicted_visits, "\n")
+```
+
+
+
